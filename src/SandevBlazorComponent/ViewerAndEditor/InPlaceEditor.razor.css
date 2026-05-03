@@ -1,0 +1,56 @@
+﻿.ipe-container {
+    display: inline-block;
+    position: relative;
+}
+
+.ipe-display {
+    border-bottom: 1px dashed #999;
+    cursor: pointer;
+}
+
+.ipe-editor {
+    display: flex;
+    gap: 5px;
+}
+
+.ipe-editor.popup {
+    position: absolute;
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+.ipe-input {
+    padding: 4px;
+}
+
+.ipe-btn {
+    cursor: pointer;
+}
+
+.ipe-editor.popup {
+    position: fixed; /* penting! */
+    background: white;
+    border: 1px solid #ddd;
+    padding: 8px;
+    border-radius: 8px;
+    z-index: 9999;
+}
+
+.ipe-editor.popup {
+    animation: fadeIn 0.15s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

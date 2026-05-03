@@ -1,0 +1,44 @@
+﻿@using SandevBlazorComponent.Infrastructure.EnumClass
+
+@typeparam T
+
+<div class="ipe-container" @ref="ContainerRef">
+
+    @if (!IsEditing)
+    {
+        <span class="ipe-display"
+              @onclick="HandleClick"
+              @ondblclick="HandleDoubleClick">
+            @DisplayValue
+        </span>
+    }
+    else
+    {
+        <div class="ipe-editor @(Mode == EditorMode.Popup ? "popup" : "")"
+             @ref="PopupRef">
+
+            @if (EditorTemplate != null)
+            {
+                @EditorTemplate(CurrentValue)
+            }
+            else
+            {
+                <input @ref="InputRef"
+                       class="ipe-input"
+                       @bind="CurrentValue"
+                       @onkeydown="HandleKeyDown" />
+            }
+
+            @if (ShowButtons)
+            {
+                <button @onclick="Save">✔</button>
+                <button @onclick="Cancel">✖</button>
+            }
+        </div>
+    }
+
+</div>
+
+@code {
+
+}
