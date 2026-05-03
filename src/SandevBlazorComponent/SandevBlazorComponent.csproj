@@ -52,8 +52,8 @@
 	<!-- Include README and icon in the NuGet package -->
 	<!-- README.md dan icon.png berada di root repo (satu level di atas folder src/) -->
 	<ItemGroup>
-		<None Include="..\README.md" Pack="true" PackagePath="\" />
-		<None Include="..\icon.png" Pack="true" PackagePath="\" Condition="Exists('..\icon.png')" />
+		<None Include="README.md" Pack="true" PackagePath="\" />
+		<None Include="icon.png" Pack="true" PackagePath="\" Condition="Exists('icon.png')" />
 	</ItemGroup>
 
 	<ItemGroup>
