@@ -2,18 +2,22 @@
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using SandevBlazorComponent.Infrastructure.EnumClass;
-using SandevBlazorComponent.Infrastructure.JsInterop.ViewerAndEditor;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using SandevBlazorComponent.Infrastructure.JsInterop;
 
 namespace SandevBlazorComponent.ViewerAndEditor;
 
 public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
 {
-    [Inject] private IJSRuntime JS { get; set; }
+    [Inject] private IJSRuntime? JS { get; set; }
+    [Inject] private BaseJsInterop? JSCore { get; set; }
 
-    [Parameter] public T Value { get; set; }
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public bool FloatLabel { get; set; }
+    [Parameter] public LabelPosition LabelPosition { get; set; } = LabelPosition.Top;
+    [Parameter] public string? LabelCssClass { get; set; }
+    [Parameter] public bool Required { get; set; }
+
+    [Parameter] public T? Value { get; set; }
     [Parameter] public EventCallback<T> ValueChanged { get; set; }
 
     [Parameter] public EditorMode Mode { get; set; } = EditorMode.Inline;
@@ -21,10 +25,10 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
     [Parameter] public bool ShowButtons { get; set; } = true;
 
     // 🔥 Template support
-    [Parameter] public RenderFragment<T> EditorTemplate { get; set; }
+    [Parameter] public RenderFragment<T>? EditorTemplate { get; set; }
 
     protected bool IsEditing;
-    protected T CurrentValue;
+    protected T? CurrentValue;
 
     private bool _isJsRegistered;
 
@@ -32,13 +36,12 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
     protected ElementReference PopupRef;
     protected ElementReference ContainerRef;
 
-    private InPlaceEditorJsInterop jsInterop;
-    private DotNetObjectReference<InPlaceEditor<T>> dotnetRef;
+    private DotNetObjectReference<InPlaceEditor<T>>? dotnetRef;
 
     protected override void OnInitialized()
     {
         CurrentValue = Value;
-        jsInterop = new(JS);
+        JSCore = new(JS);
         dotnetRef = DotNetObjectReference.Create(this);
     }
 
@@ -48,12 +51,12 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
         {
             _isJsRegistered = true;
 
-            await jsInterop.Focus(InputRef);
-            await jsInterop.RegisterClickOutside(ContainerRef, dotnetRef);
+            await JSCore.Focus(InputRef);
+            await JSCore.RegisterClickOutside(ContainerRef, dotnetRef);
 
             if (Mode == EditorMode.Popup)
             {
-                await jsInterop.PositionPopup(ContainerRef, PopupRef);
+                await JSCore.PositionPopup(ContainerRef, PopupRef);
             }
         }
     }
@@ -85,7 +88,7 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
 
         Value = CurrentValue;
         await ValueChanged.InvokeAsync(Value);
-        await jsInterop.UnregisterClickOutside(ContainerRef);
+        await JSCore.UnregisterClickOutside(ContainerRef);
     }
 
     private async Task Cancel()
@@ -94,7 +97,7 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
         _isJsRegistered = false;
 
         CurrentValue = Value;
-        await jsInterop.UnregisterClickOutside(ContainerRef);
+        await JSCore.UnregisterClickOutside(ContainerRef);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -114,8 +117,8 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        if (jsInterop != null)
-            await jsInterop.DisposeAsync();
+        if (JSCore != null)
+            await JSCore.DisposeAsync();
 
         dotnetRef?.Dispose();
     }

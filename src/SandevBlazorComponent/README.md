@@ -129,6 +129,11 @@ BlazorForge components use CSS custom properties for easy theming. Override them
 | Blazor | WebAssembly or Server |
 | Browser | Modern (Chrome, Firefox, Edge, Safari) |
 
+- Blazor Server:
+  app.UseStaticFiles();
+
+- No need to add script manually
+
 ---
 
 ## 📁 Project Structure

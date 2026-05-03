@@ -2,40 +2,66 @@
 
 @typeparam T
 
-<div class="ipe-container" @ref="ContainerRef">
+<div class="ipe-wrapper @(LabelPosition == LabelPosition.Left ? "left" : "top") @(FloatLabel ? "float" : "")">
 
-    @if (!IsEditing)
+    @if (!FloatLabel && !string.IsNullOrEmpty(Label))
     {
-        <span class="ipe-display"
-              @onclick="HandleClick"
-              @ondblclick="HandleDoubleClick">
-            @DisplayValue
-        </span>
+        <label class="ipe-label">
+            @Label
+            @if (Required)
+            {
+                <span class="ipe-text-danger">*</span>
+            }
+        </label>
     }
-    else
-    {
-        <div class="ipe-editor @(Mode == EditorMode.Popup ? "popup" : "")"
-             @ref="PopupRef">
 
-            @if (EditorTemplate != null)
-            {
-                @EditorTemplate(CurrentValue)
-            }
-            else
-            {
-                <input @ref="InputRef"
-                       class="ipe-input"
-                       @bind="CurrentValue"
-                       @onkeydown="HandleKeyDown" />
-            }
+    <div class="ipe-field" @ref="ContainerRef">
 
-            @if (ShowButtons)
-            {
-                <button @onclick="Save">✔</button>
-                <button @onclick="Cancel">✖</button>
-            }
-        </div>
-    }
+        @if (FloatLabel && !string.IsNullOrEmpty(Label))
+        {
+            <label class="ipe-floating-label @(IsEditing || !string.IsNullOrEmpty(DisplayValue) ? "active" : "")">
+                @Label
+                @if (Required)
+                {
+                    <span class="ipe-text-danger">*</span>
+                }
+            </label>
+        }
+
+        @if (!IsEditing)
+        {
+            <span class="ipe-display"
+                  @onclick="HandleClick"
+                  @ondblclick="HandleDoubleClick">
+                @DisplayValue
+            </span>
+        }
+        else
+        {
+            <div class="ipe-editor @(Mode == EditorMode.Popup ? "popup" : "")"
+                 @ref="PopupRef">
+
+                @if (EditorTemplate != null)
+                {
+                    @EditorTemplate(CurrentValue)
+                }
+                else
+                {
+                    <input @ref="InputRef"
+                           class="ipe-input"
+                           @bind="CurrentValue"
+                           @onkeydown="HandleKeyDown" />
+                }
+
+                @if (ShowButtons)
+                {
+                    <button @onclick="Save">✔</button>
+                    <button @onclick="Cancel">✖</button>
+                }
+            </div>
+        }
+
+    </div>
 
 </div>
 

@@ -4,8 +4,11 @@
 		<!-- ======================== -->
 		<!--     Package Identity     -->
 		<!-- ======================== -->
+		<AssemblyName>SandevBlazorForgeComponent</AssemblyName>
 		<PackageId>SandevBlazorForgeComponent</PackageId>
-		<Version>0.0.1</Version>
+		<Version>0.0.2</Version>
+		<AssemblyVersion>0.0.2</AssemblyVersion>
+		<FileVersion>0.0.2</FileVersion>
 		<Authors>Sandev</Authors>
 		<Company>Sandev Corp.</Company>
 		<Owners>Sandev</Owners>
@@ -16,8 +19,7 @@
 		<!-- ======================== -->
 		<Title>Sandev BlazorForge Components</Title>
 		<Description>
-			SandevBlazorForgeComponent is a modern, lightweight Blazor component library
-			designed for rapid UI development. Supports Blazor WebAssembly and Blazor Server.
+			SandevBlazorForgeComponent is a modern, lightweight Blazor component library designed for rapid UI development. Supports Blazor WebAssembly and Blazor Server.
 		</Description>
 		<Summary>A modern, lightweight Blazor UI component library for WebAssembly and Server.</Summary>
 		<Tags>blazor;components;ui;webassembly;blazor-server;dotnet;razor</Tags>
@@ -26,9 +28,9 @@
 		<RepositoryType>git</RepositoryType>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<PackageIcon>icon.png</PackageIcon>
+		<!--<PackageIcon>icon.png</PackageIcon>-->
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>Initial release of SandevBlazorForgeComponent v0.0.1</PackageReleaseNotes>
+		<PackageReleaseNotes>Initial release of SandevBlazorForgeComponent v0.0.2</PackageReleaseNotes>
 
 		<!-- ======================== -->
 		<!--     Build Settings       -->
@@ -43,7 +45,8 @@
 		<NoWarn>$(NoWarn);1591</NoWarn>
 
 		<!-- NuGet pack settings -->
-		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<IsPackable>true</IsPackable>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<EmbedAllSources>true</EmbedAllSources>
@@ -53,7 +56,7 @@
 	<!-- README.md dan icon.png berada di root repo (satu level di atas folder src/) -->
 	<ItemGroup>
 		<None Include="README.md" Pack="true" PackagePath="\" />
-		<None Include="icon.png" Pack="true" PackagePath="\" Condition="Exists('icon.png')" />
+		<!--<None Include="icon.png" Pack="true" PackagePath="\" Condition="Exists('icon.png')" />-->
 	</ItemGroup>
 
 	<ItemGroup>
