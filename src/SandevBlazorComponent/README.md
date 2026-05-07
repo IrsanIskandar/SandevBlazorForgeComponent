@@ -58,6 +58,13 @@ In your `_Imports.razor`:
 @using SandevBlazorComponent.Infrastructure.EnumClass
 ```
 
+In .NET8+ your head tag and body tag `App.razor`:
+
+```razor
+<link href="_content/SandevBlazorComponent/css/sandev-blazor.css" rel="stylesheet" />
+<script src="_content/SandevBlazorComponent/js/sandev-blazor.js"></script>
+```
+
 ### 3. Use the components
 
 ```razor
