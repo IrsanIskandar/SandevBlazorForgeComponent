@@ -3,5 +3,8 @@
 public enum EditorType
 {
     Text,
-    Number
+    TextArea,
+    Numeric,
+    Date,
+    Dropdown
 }

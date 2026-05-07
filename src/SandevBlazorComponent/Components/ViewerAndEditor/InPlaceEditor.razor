@@ -2,7 +2,8 @@
 
 @typeparam T
 
-<div class="ipe-wrapper @(LabelPosition == LabelPosition.Left ? "left" : "top") @(FloatLabel ? "float" : "")">
+<div class="ipe-wrapper @(LabelPosition == LabelPosition.Left ? "left" : "top") @(FloatLabel ? "float" : "")"
+     @ref="WrapperRef">
 
     @if (!FloatLabel && !string.IsNullOrEmpty(Label))
     {
@@ -15,7 +16,7 @@
         </label>
     }
 
-    <div class="ipe-field" @ref="ContainerRef">
+    <div class="ipe-field @(IsEditing || !string.IsNullOrEmpty(Value?.ToString()) ? "active" : "")">
 
         @if (FloatLabel && !string.IsNullOrEmpty(Label))
         {
@@ -44,8 +45,10 @@
         }
         else
         {
-            <div class="ipe-editor @(Mode == EditorMode.Popup ? "popup" : "")"
-                 @ref="PopupRef">
+            <!-- 🔥 EDITOR (INLINE / POPUP) -->
+            <div class="ipe-editor @(Mode == EditorMode.Popup ? "popup" : "inline")"
+                 @ref="EditorRef"
+                 tabindex="-1">
 
                 @if (EditorTemplate != null)
                 {
@@ -53,16 +56,15 @@
                 }
                 else
                 {
-                    <input @ref="InputRef"
-                           class="ipe-input"
-                           @bind="CurrentValue"
-                           @onkeydown="HandleKeyDown" />
+                    @RenderEditor()
                 }
 
                 @if (ShowButtons)
                 {
-                    <button @onclick="Save">✔</button>
-                    <button @onclick="Cancel">✖</button>
+                    <div class="ipe-actions">
+                        <button type="button" @onclick="Save">✔</button>
+                        <button type="button" @onclick="Cancel">✖</button>
+                    </div>
                 }
             </div>
         }

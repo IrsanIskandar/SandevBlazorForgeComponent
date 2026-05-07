@@ -23,8 +23,13 @@ public class BaseJsInterop : IAsyncDisposable
         await module.InvokeVoidAsync("focusElement", element);
     }
 
-    public async Task RegisterClickOutside<T>(ElementReference element, DotNetObjectReference<T> dotnetRef)
-        where T : class
+    public async Task FocusFirstInput(ElementReference container)
+    {
+        var module = await moduleTask.Value;
+        await module.InvokeVoidAsync("focusFirstInput", container);
+    }
+
+    public async Task RegisterClickOutside<T>(ElementReference element, DotNetObjectReference<T> dotnetRef) where T : class
     {
         var module = await moduleTask.Value;
         await module.InvokeVoidAsync("registerClickOutside", element, dotnetRef);

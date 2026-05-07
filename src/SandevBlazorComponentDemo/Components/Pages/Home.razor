@@ -1,4 +1,6 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+
 @using SandevBlazorComponent.Components.ViewerAndEditor
 
 <PageTitle>Home</PageTitle>
@@ -7,14 +9,16 @@
 
 <InPlaceEditor T="string"
     EditableOn="EditableOn.Click"
+    LabelPosition="LabelPosition.Left"
+    FloatLabel="true"
     Label="Demo In Place Editor"
     Required="true"
     Mode="EditorMode.Inline"
     ShowButtons="true"
-    LabelPosition="LabelPosition.Left"
+    EditorType="EditorType.Text"
     @bind-Value="defaultValue">
 </InPlaceEditor>
 
 @code {
-    private string defaultValue = "Click Me To Edit!";
+    private string defaultValue = "";
 }

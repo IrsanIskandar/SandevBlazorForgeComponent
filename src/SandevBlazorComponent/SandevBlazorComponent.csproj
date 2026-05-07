@@ -4,11 +4,11 @@
 		<!-- ======================== -->
 		<!--     Package Identity     -->
 		<!-- ======================== -->
-		<AssemblyName>SandevBlazorForgeComponent</AssemblyName>
-		<PackageId>SandevBlazorForgeComponent</PackageId>
-		<Version>0.0.4</Version>
-		<AssemblyVersion>0.0.4</AssemblyVersion>
-		<FileVersion>0.0.4</FileVersion>
+		<AssemblyName>SandevBlazorComponent</AssemblyName>
+		<PackageId>SandevBlazorComponent</PackageId>
+		<Version>0.0.5</Version>
+		<AssemblyVersion>0.0.5</AssemblyVersion>
+		<FileVersion>0.0.5</FileVersion>
 		<Authors>Sandev</Authors>
 		<Company>Sandev Corp.</Company>
 		<Owners>Sandev</Owners>
@@ -19,7 +19,7 @@
 		<!-- ======================== -->
 		<Title>Sandev BlazorForge Components</Title>
 		<Description>
-			SandevBlazorForgeComponent is a modern, lightweight Blazor component library designed for rapid UI development. Supports Blazor WebAssembly and Blazor Server.
+			SandevBlazorComponent is a modern, lightweight Blazor component library designed for rapid UI development. Supports Blazor WebAssembly and Blazor Server.
 		</Description>
 		<Summary>A modern, lightweight Blazor UI component library for WebAssembly and Server.</Summary>
 		<Tags>blazor;components;ui;webassembly;blazor-server;dotnet;razor</Tags>
@@ -30,7 +30,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!--<PackageIcon>icon.png</PackageIcon>-->
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-		<PackageReleaseNotes>Initial release of SandevBlazorForgeComponent v0.0.4</PackageReleaseNotes>
+		<PackageReleaseNotes>Initial release of SandevBlazorComponent v0.0.5</PackageReleaseNotes>
 
 		<!-- ======================== -->
 		<!--     Build Settings       -->

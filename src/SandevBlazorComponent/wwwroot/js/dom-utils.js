@@ -1,26 +1,51 @@
-﻿let clickOutsideHandlers = new Map();
+﻿let clickOutsideMap = new Map();
+
+//export function registerClickOutside(element, dotnetRef) {
+//    function handler(event) {
+//        setTimeout(() => {
+//            if (!element.contains(event.target)) {
+//                dotnetRef.invokeMethodAsync("OnClickOutside");
+//            }
+//        }, 0);
+//    }
+
+//    document.addEventListener("click", handler);
+//    clickOutsideMap.set(element, handler);
+//}
+
+//export function unregisterClickOutside(element) {
+//    const handler = clickOutsideMap.get(element);
+//    if (handler) {
+//        document.removeEventListener("click", handler);
+//        clickOutsideMap.delete(element);
+//    }
+//}
 
 export function registerClickOutside(element, dotnetRef) {
-    function handler(event) {
-        if (!element.contains(event.target)) {
+    if (!element) return;
+
+    function handler(e) {
+        if (!element.contains(e.target)) {
             dotnetRef.invokeMethodAsync("OnClickOutside");
         }
     }
 
     document.addEventListener("mousedown", handler);
-    clickOutsideHandlers.set(element, handler);
+    clickOutsideMap.set(element, handler);
 }
 
 export function unregisterClickOutside(element) {
-    const handler = clickOutsideHandlers.get(element);
+    const handler = clickOutsideMap.get(element);
     if (handler) {
         document.removeEventListener("mousedown", handler);
-        clickOutsideHandlers.delete(element);
+        clickOutsideMap.delete(element);
     }
 }
 
 export function focusElement(element) {
-    element?.focus();
+    if (element && typeof element.focus === "function") {
+        element.focus();
+    }
 }
 
 export function positionPopup(target, popup) {
@@ -52,3 +77,13 @@ export function positionPopup(target, popup) {
     popup.style.left = `${left}px`;
     popup.style.zIndex = "9999";
 }
+
+export function focusFirstInput(container) {
+    if (!container) return;
+
+    const el = container.querySelector("input, textarea, select, [contenteditable='true']");
+    if (el && typeof el.focus === "function") {
+        el.focus();
+    }
+}
+
