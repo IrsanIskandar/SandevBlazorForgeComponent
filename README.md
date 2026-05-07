@@ -177,7 +177,7 @@ This project is licensed under the **MIT License** — see the [LICENSE](LICENSE
 
 ## 🙋 Support
 
-- 🐛 Found a bug? [Open an issue](https://github.com/YOUR_USERNAME/BlazorForge.Components/issues)
+- 🐛 Found a bug? [Open an issue](https://github.com/IrsanIskandar/SandevBlazorForgeComponent/issues)
 - 💡 Have an idea? [Start a discussion](https://github.com/YOUR_USERNAME/BlazorForge.Components/discussions)
 - ⭐ Like the project? Give it a star on GitHub!
 

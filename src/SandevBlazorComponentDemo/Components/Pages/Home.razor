@@ -1,0 +1,20 @@
+﻿@page "/"
+@using SandevBlazorComponent.Components.ViewerAndEditor
+
+<PageTitle>Home</PageTitle>
+
+<h1>Welcome to Sandev Blazor Component!</h1>
+
+<InPlaceEditor T="string"
+    EditableOn="EditableOn.Click"
+    Label="Demo In Place Editor"
+    Required="true"
+    Mode="EditorMode.Inline"
+    ShowButtons="true"
+    LabelPosition="LabelPosition.Left"
+    @bind-Value="defaultValue">
+</InPlaceEditor>
+
+@code {
+    private string defaultValue = "Click Me To Edit!";
+}

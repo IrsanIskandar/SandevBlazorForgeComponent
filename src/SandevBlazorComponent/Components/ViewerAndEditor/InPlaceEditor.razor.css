@@ -73,14 +73,14 @@
     gap: 5px;
 }
 
-.ipe-editor.popup {
-    position: absolute;
-    background: white;
-    border: 1px solid #ddd;
-    padding: 8px;
-    border-radius: 8px;
-    z-index: 1000;
-}
+    .ipe-editor.popup {
+        position: absolute;
+        background: white;
+        border: 1px solid #ddd;
+        padding: 8px;
+        border-radius: 8px;
+        z-index: 1000;
+    }
 
 .ipe-input {
     padding: 4px;

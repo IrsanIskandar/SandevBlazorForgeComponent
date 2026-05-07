@@ -4,12 +4,12 @@ using Microsoft.JSInterop;
 using SandevBlazorComponent.Infrastructure.EnumClass;
 using SandevBlazorComponent.Infrastructure.JsInterop;
 
-namespace SandevBlazorComponent.ViewerAndEditor;
+namespace SandevBlazorComponent.Components.ViewerAndEditor;
 
 public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    [Inject] private BaseJsInterop? JSCore { get; set; }
+    [Inject] protected BaseJsInterop JSCore { get; set; } = default!;
 
     [Parameter] public string? Label { get; set; }
     [Parameter] public bool FloatLabel { get; set; }
@@ -19,6 +19,7 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
 
     [Parameter] public T? Value { get; set; }
     [Parameter] public EventCallback<T> ValueChanged { get; set; }
+    [Parameter] public string EmptyText { get; set; } = "Click to edit";
 
     [Parameter] public EditorMode Mode { get; set; } = EditorMode.Inline;
     [Parameter] public EditableOn EditableOn { get; set; } = EditableOn.Click;
@@ -38,21 +39,38 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
 
     private DotNetObjectReference<InPlaceEditor<T>>? dotnetRef;
 
-    protected override void OnInitialized()
+    private string DisplayValue => Value?.ToString() ?? "";
+
+    protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
+
         CurrentValue = Value;
-        JSCore = new(JS);
         dotnetRef = DotNetObjectReference.Create(this);
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            CurrentValue = Value;
+
+            JSCore ??= new BaseJsInterop(JS);
+
+            dotnetRef ??= DotNetObjectReference.Create(this);
+        }
+
         if (IsEditing && !_isJsRegistered)
         {
             _isJsRegistered = true;
 
             await JSCore.Focus(InputRef);
-            await JSCore.RegisterClickOutside(ContainerRef, dotnetRef);
+
+            await JSCore.RegisterClickOutside(
+                ContainerRef,
+                dotnetRef);
 
             if (Mode == EditorMode.Popup)
             {
@@ -61,24 +79,24 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
         }
     }
 
-    private string DisplayValue => Value?.ToString() ?? "";
-
-    private void HandleClick()
+    private async Task HandleClick()
     {
         if (EditableOn == EditableOn.Click)
-            EnableEdit();
+            await EnableEdit();
     }
 
-    private void HandleDoubleClick()
-    {
-        if (EditableOn == EditableOn.DoubleClick)
-            EnableEdit();
-    }
-
-    private void EnableEdit()
+    private async Task EnableEdit()
     {
         CurrentValue = Value;
         IsEditing = true;
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task HandleDoubleClick()
+    {
+        if (EditableOn == EditableOn.DoubleClick)
+            await EnableEdit();
     }
 
     private async Task Save()
