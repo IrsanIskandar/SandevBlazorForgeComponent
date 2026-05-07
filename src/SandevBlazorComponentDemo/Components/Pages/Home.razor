@@ -10,7 +10,7 @@
 <InPlaceEditor T="string"
     EditableOn="EditableOn.Click"
     LabelPosition="LabelPosition.Left"
-    FloatLabel="true"
+    FloatLabel="false"
     Label="Demo In Place Editor"
     Required="true"
     Mode="EditorMode.Inline"
@@ -18,7 +18,42 @@
     EditorType="EditorType.Text"
     @bind-Value="defaultValue">
 </InPlaceEditor>
+<br />
+<br />
+<CaptchaImage @ref="imageCaptcha" />
+
+<button @onclick="SubmitCaptchaImage">Submit</button>
+<br />
+<br />
+<MathCaptcha @ref="mathCaptcha" />
+
+<button @onclick="SubmitMathCaptcha">Submit</button>
 
 @code {
     private string defaultValue = "";
+
+    private CaptchaImage imageCaptcha;
+    private MathCaptcha mathCaptcha;
+
+    private void SubmitCaptchaImage()
+    {
+        if (!imageCaptcha.Validate())
+        {
+            Console.WriteLine("Captcha salah ❌");
+            return;
+        }
+
+        Console.WriteLine("Captcha benar ✅");
+    }
+
+    private void SubmitMathCaptcha()
+    {
+        if (!mathCaptcha.Validate())
+        {
+            Console.WriteLine("Math captcha salah ❌");
+            return;
+        }
+
+        Console.WriteLine("Valid ✅");
+    }
 }

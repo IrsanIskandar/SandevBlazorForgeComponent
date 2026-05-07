@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using SandevBlazorComponent.Infrastructure.EnumClass;
 using SandevBlazorComponent.Infrastructure.JsInterop;
+using SandevBlazorComponent.Infrastructure.JsInterop.ViewerAndEditor;
 using System.Globalization;
 
 namespace SandevBlazorComponent.Components.ViewerAndEditor;
 
-public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
+public partial class InPlaceEditor<T> : IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    [Inject] protected BaseJsInterop JSCore { get; set; } = default!;
 
     [Parameter] public string? Label { get; set; }
     [Parameter] public bool FloatLabel { get; set; }
@@ -35,7 +35,6 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
     protected bool IsEditing;
     protected T? CurrentValue;
 
-    private bool _isJsRegistered;
     private bool _shouldFocus;
 
     protected ElementReference InputRef;
@@ -44,6 +43,8 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
     protected ElementReference EditorRef;   // untuk focus
 
     private DotNetObjectReference<InPlaceEditor<T>>? dotnetRef;
+
+    private IJSObjectReference? _module;
 
     private string DisplayValue => Value?.ToString() ?? "";
 
@@ -59,39 +60,28 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
     {
         await base.OnAfterRenderAsync(firstRender);
 
-        //if (IsEditing && !_isJsRegistered)
-        //{
-        //    _isJsRegistered = true;
+        if (firstRender)
+        {
+            _module = await JS!.InvokeAsync<IJSObjectReference>(
+                "import",
+                "./_content/SandevBlazorComponent/js/viewer-and-editor/inplace-editor.js");
+        }
 
-        //    await Task.Yield();
-
-        //    if (InputRef.Context != null) // 🔥 penting
-        //    {
-        //        await JSCore.Focus(InputRef);
-        //    }
-
-        //    await JSCore.RegisterClickOutside(ContainerRef, dotnetRef);
-
-        //    if (Mode == EditorMode.Popup)
-        //    {
-        //        await JSCore.PositionPopup(ContainerRef, PopupRef);
-        //    }
-        //}
-
-        if (_shouldFocus)
+        if (_shouldFocus && _module != null)
         {
             _shouldFocus = false;
 
             await Task.Yield();
 
-            await JSCore.FocusFirstInput(EditorRef);
+            await _module.InvokeVoidAsync("focusFirstInput", EditorRef);
 
-            await Task.Delay(100); // 🔥 penting untuk popup
-            await JSCore.RegisterClickOutside(WrapperRef, dotnetRef);
+            await Task.Delay(100);
+
+            await _module.InvokeVoidAsync("registerClickOutside", WrapperRef, dotnetRef);
 
             if (Mode == EditorMode.Popup)
             {
-                await JSCore.PositionPopup(WrapperRef, EditorRef);
+                await _module.InvokeVoidAsync("positionPopup", WrapperRef, EditorRef);
             }
         }
     }
@@ -114,22 +104,22 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
             return;
 
         IsEditing = false;
-        _isJsRegistered = false;
 
         Value = CurrentValue;
         await ValueChanged.InvokeAsync(Value);
 
-        await JSCore.UnregisterClickOutside(WrapperRef);
+        if (_module != null)
+            await _module.InvokeVoidAsync("unregisterClickOutside", WrapperRef);
     }
 
     private async Task Cancel()
     {
         IsEditing = false;
-        _isJsRegistered = false;
 
         CurrentValue = Value;
 
-        await JSCore.UnregisterClickOutside(WrapperRef);
+        if (_module != null)
+            await _module.InvokeVoidAsync("unregisterClickOutside", WrapperRef);
     }
 
     private async Task HandleKeyDown(KeyboardEventArgs e)
@@ -272,13 +262,31 @@ public partial class InPlaceEditor<T> : ComponentBase, IAsyncDisposable
         builder.CloseElement();
     }
 
+    private string GetWrapperClass()
+    {
+        return LabelPosition switch
+        {
+            LabelPosition.Left => "left",
+            LabelPosition.Right => "right",
+            _ => "top"
+        };
+    }
+
     public async ValueTask DisposeAsync()
     {
         try
         {
-            await JSCore.UnregisterClickOutside(WrapperRef);
+            if (_module != null)
+            {
+                await _module.InvokeVoidAsync("unregisterClickOutside", WrapperRef);
+                await _module.InvokeVoidAsync("unregisterPopup", EditorRef); // 🔥 penting
+                await _module.DisposeAsync();
+            }
         }
-        catch { }
+        catch (JSDisconnectedException)
+        {
+            // aman
+        }
 
         dotnetRef?.Dispose();
     }

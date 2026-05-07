@@ -1,0 +1,52 @@
+﻿@inject IInvisibleCaptchaService CaptchaService
+@inject IJSRuntime JS
+
+<input type="text" style="display:none" @bind="_honeypot" />
+
+@code {
+    private string? _token;
+    private string? _honeypot;
+
+    private IJSObjectReference? _tracker;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var fp = await GetFingerprint();
+        _token = CaptchaService.GenerateToken(fp);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool first)
+    {
+        if (first)
+        {
+            _tracker = await JS.InvokeAsync<IJSObjectReference>("sandevCaptcha.init");
+        }
+    }
+
+    private async Task<string> GetFingerprint()
+    {
+        return await JS.InvokeAsync<string>("eval",
+            "navigator.userAgent + '|' + screen.width + 'x' + screen.height");
+    }
+
+    public async Task<bool> ValidateAsync()
+    {
+        var data = await _tracker!.InvokeAsync<dynamic>("getData");
+
+        var request = new InvisibleCaptchaRequest
+        {
+            Token = _token!,
+            Fingerprint = data.fingerprint,
+            Honeypot = _honeypot,
+            Interactions = ((IEnumerable<object>)data.points)
+                .Select(p => new MousePoint
+                {
+                    X = (int)p.GetType().GetProperty("x")!.GetValue(p)!,
+                    Y = (int)p.GetType().GetProperty("y")!.GetValue(p)!,
+                    Time = DateTime.Parse((string)p.GetType().GetProperty("time")!.GetValue(p)!)
+                }).ToList()
+        };
+
+        return CaptchaService.ValidateToken(request);
+    }
+}

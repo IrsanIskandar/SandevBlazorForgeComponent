@@ -1,0 +1,40 @@
+﻿<div class="sandev-captcha">
+    <img src="@ImageBase64" />
+
+    <button type="button" @onclick="Refresh">🔄</button>
+    <br />
+    <input @bind="Value" placeholder="Enter captcha" />
+</div>
+
+@code {
+    private string? _key;
+    private string? ImageBase64;
+
+    public string? Value { get; set; }
+
+    [Inject] ICaptchaService CaptchaService { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    private void Generate()
+    {
+        var result = CaptchaService.Generate();
+
+        _key = result.Key;
+        ImageBase64 = result.Base64Image;
+        Value = null;
+    }
+
+    private void Refresh()
+    {
+        Generate();
+    }
+
+    public bool Validate()
+    {
+        return CaptchaService.ValidateCaptcha(_key!, Value!);
+    }
+}

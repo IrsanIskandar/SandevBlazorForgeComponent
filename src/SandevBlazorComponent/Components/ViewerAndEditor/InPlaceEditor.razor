@@ -1,8 +1,9 @@
 ﻿@using SandevBlazorComponent.Infrastructure.EnumClass
 
 @typeparam T
+@inherits SandevComponentBase
 
-<div class="ipe-wrapper @(LabelPosition == LabelPosition.Left ? "left" : "top") @(FloatLabel ? "float" : "")"
+<div class="ipe-wrapper @GetWrapperClass() @(FloatLabel ? "float" : "")"
      @ref="WrapperRef">
 
     @if (!FloatLabel && !string.IsNullOrEmpty(Label))
@@ -16,7 +17,7 @@
         </label>
     }
 
-    <div class="ipe-field @(IsEditing || !string.IsNullOrEmpty(Value?.ToString()) ? "active" : "")">
+    <div class="ipe-field @(IsEditing || !string.IsNullOrEmpty(Value?.ToString()) ? "active" : "") @GetWrapperClass()">
 
         @if (FloatLabel && !string.IsNullOrEmpty(Label))
         {

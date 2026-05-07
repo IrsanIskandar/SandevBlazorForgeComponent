@@ -1,33 +1,52 @@
-﻿let handlers = {};
+﻿let clickOutsideMap = new Map();
+let popupMap = new Map(); // 🔥 untuk tracking popup
 
+// ===============================
+// CLICK OUTSIDE
+// ===============================
 export function registerClickOutside(element, dotnetRef) {
-    function handler(event) {
-        if (!element.contains(event.target)) {
+    if (!element) return;
+
+    function handler(e) {
+        if (!element.contains(e.target)) {
             dotnetRef.invokeMethodAsync("OnClickOutside");
         }
     }
 
-    document.addEventListener("mousedown", handler);
-    handlers[element] = handler;
+    document.addEventListener("pointerdown", handler);
+    clickOutsideMap.set(element, handler);
 }
 
 export function unregisterClickOutside(element) {
-    const handler = handlers[element];
+    const handler = clickOutsideMap.get(element);
     if (handler) {
-        document.removeEventListener("mousedown", handler);
-        delete handlers[element];
+        document.removeEventListener("pointerdown", handler);
+        clickOutsideMap.delete(element);
     }
 }
 
+// ===============================
+// FOCUS
+// ===============================
 export function focusElement(element) {
-    if (element) {
+    if (element && typeof element.focus === "function") {
         element.focus();
     }
 }
 
-export function positionPopup(target, popup) {
-    if (!target || !popup) return;
+export function focusFirstInput(container) {
+    if (!container) return;
 
+    const el = container.querySelector("input, textarea, select, [contenteditable='true']");
+    if (el && typeof el.focus === "function") {
+        el.focus();
+    }
+}
+
+// ===============================
+// POPUP POSITION
+// ===============================
+function calculatePosition(target, popup) {
     const rect = target.getBoundingClientRect();
     const popupRect = popup.getBoundingClientRect();
 
@@ -37,17 +56,16 @@ export function positionPopup(target, popup) {
     let top = rect.bottom;
     let left = rect.left;
 
-    // 🔥 cek overflow bawah → pindah ke atas
+    // overflow bawah → pindah ke atas
     if (rect.bottom + popupRect.height > viewportHeight) {
         top = rect.top - popupRect.height;
     }
 
-    // 🔥 cek overflow kanan → geser kiri
+    // overflow kanan → geser kiri
     if (rect.left + popupRect.width > viewportWidth) {
         left = viewportWidth - popupRect.width - 10;
     }
 
-    // 🔥 minimal padding kiri
     if (left < 10) left = 10;
 
     popup.style.position = "fixed";
@@ -56,10 +74,29 @@ export function positionPopup(target, popup) {
     popup.style.zIndex = "9999";
 }
 
-window.addEventListener("scroll", () => {
-    positionPopup(target, popup);
-});
+// 🔥 register popup + auto update
+export function positionPopup(target, popup) {
+    if (!target || !popup) return;
 
-window.addEventListener("resize", () => {
-    positionPopup(target, popup);
-});
+    function update() {
+        calculatePosition(target, popup);
+    }
+
+    update();
+
+    // simpan supaya bisa di-unregister nanti
+    popupMap.set(popup, update);
+
+    window.addEventListener("scroll", update);
+    window.addEventListener("resize", update);
+}
+
+// 🔥 WAJIB untuk cleanup
+export function unregisterPopup(popup) {
+    const update = popupMap.get(popup);
+    if (update) {
+        window.removeEventListener("scroll", update);
+        window.removeEventListener("resize", update);
+        popupMap.delete(popup);
+    }
+}

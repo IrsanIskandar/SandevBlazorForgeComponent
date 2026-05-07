@@ -1,3 +1,4 @@
+using SandevBlazorComponent;
 using SandevBlazorComponentDemo.Components;
 
 namespace SandevBlazorComponentDemo;
@@ -16,7 +17,7 @@ public class Program
                 options.DetailedErrors = true;
             });
 
-        builder.Services.AddScoped<SandevBlazorComponent.Infrastructure.JsInterop.BaseJsInterop>();
+        builder.Services.AddSandevBlazor();
 
         var app = builder.Build();
 

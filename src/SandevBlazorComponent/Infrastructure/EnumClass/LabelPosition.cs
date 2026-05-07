@@ -3,5 +3,6 @@
 public enum LabelPosition
 {
     Top,
-    Left
+    Left,
+    Right
 }

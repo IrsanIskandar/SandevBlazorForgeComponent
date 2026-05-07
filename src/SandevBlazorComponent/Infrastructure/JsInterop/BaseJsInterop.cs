@@ -3,56 +3,22 @@ using Microsoft.JSInterop;
 
 namespace SandevBlazorComponent.Infrastructure.JsInterop;
 
-public class BaseJsInterop : IAsyncDisposable
+public class BaseJsInterop
 {
-    private readonly Lazy<Task<IJSObjectReference>> moduleTask;
+    private readonly IJSRuntime _js;
 
-    private const string JS_PATH = "./_content/SandevBlazorComponent/js/dom-utils.js";
-
-    public BaseJsInterop(IJSRuntime jsRuntime)
+    public BaseJsInterop(IJSRuntime js)
     {
-        moduleTask = new(() =>
-            jsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", JS_PATH
-            ).AsTask());
+        _js = js;
     }
 
-    public async Task Focus(ElementReference element)
+    public async Task FocusElement(ElementReference el)
     {
-        var module = await moduleTask.Value;
-        await module.InvokeVoidAsync("focusElement", element);
+        await _js.InvokeVoidAsync("sandev.focusElement", el);
     }
 
-    public async Task FocusFirstInput(ElementReference container)
+    public async Task ScrollToTop()
     {
-        var module = await moduleTask.Value;
-        await module.InvokeVoidAsync("focusFirstInput", container);
-    }
-
-    public async Task RegisterClickOutside<T>(ElementReference element, DotNetObjectReference<T> dotnetRef) where T : class
-    {
-        var module = await moduleTask.Value;
-        await module.InvokeVoidAsync("registerClickOutside", element, dotnetRef);
-    }
-
-    public async Task UnregisterClickOutside(ElementReference element)
-    {
-        var module = await moduleTask.Value;
-        await module.InvokeVoidAsync("unregisterClickOutside", element);
-    }
-
-    public async Task PositionPopup(ElementReference target, ElementReference popup)
-    {
-        var module = await moduleTask.Value;
-        await module.InvokeVoidAsync("positionPopup", target, popup);
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-        if (moduleTask.IsValueCreated)
-        {
-            var module = await moduleTask.Value;
-            await module.DisposeAsync();
-        }
+        await _js.InvokeVoidAsync("window.scrollTo", 0, 0);
     }
 }

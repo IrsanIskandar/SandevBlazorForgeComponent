@@ -1,0 +1,26 @@
+﻿.sandev-captcha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sandev-captcha img {
+    height: 50px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+.sandev-captcha button {
+    cursor: pointer;
+}
+
+.sandev-math-captcha {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.sandev-math-captcha .question {
+    font-weight: bold;
+    font-size: 16px;
+}

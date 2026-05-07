@@ -4,26 +4,6 @@
     gap: 4px;
 }
 
-.ipe-container {
-    display: inline-block;
-    width: auto; /* 🔥 fix stretch */
-}
-
-.ipe-display {
-    display: inline-block;
-    min-width: 120px;
-}
-
-.ipe-label {
-    font-size: 12px;
-    color: #666;
-    font-weight: 500;
-}
-
-.ipe-label {
-    min-width: 120px;
-}
-
 /* Wrapper layout */
 .ipe-wrapper.top {
     align-items: flex-start; /* 🔥 penting */
@@ -31,41 +11,91 @@
 
 .ipe-wrapper.left {
     display: flex;
-    align-items: flex-start; /* 🔥 bukan center */
+    flex-direction: row; /* 🔥 INI FIX UTAMA */
+    align-items: flex-start;
     gap: 10px;
+}
+
+.ipe-wrapper.right {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.ipe-container {
+    display: inline-block;
+    width: auto; /* 🔥 fix stretch */
+}
+
+.ipe-display {
+    display: inline-block; /* 🔥 bukan block */
+    min-width: 120px;
+    padding: 10px 10px 4px 10px; /* 🔥 atas lebih besar */
+    border-bottom: 1px dashed #999;
+    cursor: pointer;
+}
+
+.ipe-label {
+    font-size: 12pt;
+    color: #666;
+    font-weight: 500;
+    min-width: 150px;
 }
 
 /* Floating */
 .ipe-field {
     position: relative;
-    display: inline-block;
-    width: 100%;
+    display: inline-block; /* 🔥 penting */
+    width: auto; /* 🔥 jangan 100% */
+    top: -4px;
 }
 
-/* DEFAULT (placeholder position) */
 .ipe-floating-label {
     position: absolute;
-    left: -10px;
-    top: -15%;
-    transform: translateY(-35%);
-    font-size: 10pt;
+    left: 10px;
+    top: 12px; /* 🔥 bukan 50% lagi */
+    font-size: 12pt;
     color: #999;
     pointer-events: none;
     transition: all 0.2s ease;
+
+    max-width: 100%;
+    white-space: normal;
+    line-height: 1.1;
 }
 
-/* ACTIVE (float ke atas) */
+.ipe-wrapper.float .ipe-field {
+    padding-top: 24px; /* 🔥 lebih tinggi */
+}
+
+/* Saat BELUM aktif (display mode) */
+.ipe-field:not(.active) .ipe-floating-label {
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Saat ACTIVE */
 .ipe-field.active .ipe-floating-label {
-    top: -20px;
+    top: -8px;
     font-size: 12pt;
     background: white;
     padding: 0 4px;
     color: #333;
 }
 
+.ipe-wrapper.float .ipe-display {
+    padding-top: 24px; /* 🔥 ruang label */
+}
+
+.ipe-display:hover {
+    border-bottom: 1px solid #333;
+}
+
 /* Input */
 .ipe-input {
-    padding: 10px;
+    padding: 8px 10px;
     width: 100%;
 }
 
@@ -80,33 +110,17 @@
 }
 
 .ipe-editor.popup {
-    position: fixed; /* 🔥 keep ini */
+    position: fixed;
     background: white;
     border: 1px solid #ddd;
     padding: 8px;
     border-radius: 8px;
     z-index: 9999;
-}
-
-.ipe-input {
-    padding: 4px;
+    animation: fadeIn 0.15s ease-in-out;
 }
 
 .ipe-btn {
     cursor: pointer;
-}
-
-.ipe-editor.popup {
-    position: fixed; /* penting! */
-    background: white;
-    border: 1px solid #ddd;
-    padding: 8px;
-    border-radius: 8px;
-    z-index: 9999;
-}
-
-.ipe-editor.popup {
-    animation: fadeIn 0.15s ease-in-out;
 }
 
 .ipe-text-danger {

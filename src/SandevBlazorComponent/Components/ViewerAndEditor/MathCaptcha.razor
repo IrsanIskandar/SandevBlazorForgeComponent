@@ -1,0 +1,49 @@
+﻿<div class="sandev-math-captcha">
+    <span class="question">@Question</span>
+
+    <input type="number" @bind="Value" />
+    <br />
+    <button type="button" @onclick="Refresh">🔄</button>
+</div>
+
+@code {
+    private string? _key;
+    private string? Question;
+
+    public int? Value { get; set; }
+
+    [Inject] IMathCaptchaService Service { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    private void Generate()
+    {
+        var result = Service.Generate();
+
+        _key = result.key;
+        Question = result.question;
+        Value = null;
+    }
+
+    private void Refresh()
+    {
+        Generate();
+    }
+
+    public bool Validate()
+    {
+        if (Value == null) return false;
+
+        var result = Service.Validate(_key!, Value.Value);
+
+        if (!result)
+        {
+            Generate(); // 🔥 auto refresh kalau salah
+        }
+
+        return result;
+    }
+}
