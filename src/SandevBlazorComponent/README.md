@@ -25,13 +25,13 @@ A modern, lightweight Blazor component library for rapid UI development — supp
 Install via **NuGet Package Manager**:
 
 ```bash
-dotnet add package BlazorForge.Components
+dotnet add package SandevBlazorComponent
 ```
 
 Or via the NuGet Package Manager Console in Visual Studio:
 
 ```powershell
-Install-Package BlazorForge.Components
+Install-Package SandevBlazorComponent
 ```
 
 ---
@@ -43,10 +43,10 @@ Install-Package BlazorForge.Components
 In your `Program.cs`:
 
 ```csharp
-using BlazorForge.Components;
+using SandevBlazorComponent;
 
 // Add BlazorForge services (if any DI registration is needed)
-builder.Services.AddBlazorForge();
+builder.Services.AddSandevBlazor();
 ```
 
 ### 2. Add the namespace globally
@@ -54,7 +54,8 @@ builder.Services.AddBlazorForge();
 In your `_Imports.razor`:
 
 ```razor
-@using BlazorForge.Components
+@using SandevBlazorComponent
+@using SandevBlazorComponent.Infrastructure.EnumClass
 ```
 
 ### 3. Use the components
