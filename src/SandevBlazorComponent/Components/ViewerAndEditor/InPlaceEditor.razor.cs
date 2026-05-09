@@ -2,14 +2,13 @@
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using SandevBlazorComponent.Infrastructure;
 using SandevBlazorComponent.Infrastructure.EnumClass;
-using SandevBlazorComponent.Infrastructure.JsInterop;
-using SandevBlazorComponent.Infrastructure.JsInterop.ViewerAndEditor;
 using System.Globalization;
 
 namespace SandevBlazorComponent.Components.ViewerAndEditor;
 
-public partial class InPlaceEditor<T> : IAsyncDisposable
+public partial class InPlaceEditor<T> : SandevComponentBase, IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
 
@@ -62,9 +61,11 @@ public partial class InPlaceEditor<T> : IAsyncDisposable
 
         if (firstRender)
         {
-            _module = await JS!.InvokeAsync<IJSObjectReference>(
-                "import",
-                "./_content/SandevBlazorComponent/js/viewer-and-editor/inplace-editor.js");
+            //_module = await JS!.InvokeAsync<IJSObjectReference>(
+            //    "import",
+            //    "js/viewer-and-editor/inplace-editor.js");
+
+            await LoadModuleAsync("js/viewer-and-editor/inplace-editor.js");
         }
 
         if (_shouldFocus && _module != null)

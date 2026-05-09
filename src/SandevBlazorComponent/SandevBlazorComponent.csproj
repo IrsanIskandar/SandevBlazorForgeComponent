@@ -84,4 +84,23 @@
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.*" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="wwwroot\font-awesome\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="wwwroot\css\sandev-blazor.css">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="wwwroot\js\sandev-blazor.js">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="wwwroot\js\sandev-loader.js">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	  <Content Update="wwwroot\js\viewer-and-editor\inplace-editor.js">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Content>
+	</ItemGroup>
+
 </Project>

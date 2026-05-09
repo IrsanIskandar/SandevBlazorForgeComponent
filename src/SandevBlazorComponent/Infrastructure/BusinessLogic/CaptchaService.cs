@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Options;
 using SandevBlazorComponent.Infrastructure.Interfaces;
 using SandevBlazorComponent.Infrastructure.Models;
 using SixLabors.Fonts;
@@ -24,9 +25,9 @@ public class CaptchaService : ICaptchaService
         _cache = cache;
     }
 
-    private (string key, string base64Image) GenerateCaptcha()
+    public ImageCaptchaResult Generate(CaptchaRequest req)
     {
-        var text = GenerateRandomText(5);
+        var text = GenerateRandomText(req);
         var key = Guid.NewGuid().ToString();
 
         var entry = new CaptchaEntry
@@ -38,26 +39,7 @@ public class CaptchaService : ICaptchaService
 
         _cache.Set(key, entry, TimeSpan.FromMinutes(ExpireMinutes));
 
-        var imageBytes = GenerateImage(text);
-
-        return (key, $"data:image/png;base64,{Convert.ToBase64String(imageBytes)}");
-    }
-
-    public ImageCaptchaResult Generate()
-    {
-        var text = GenerateRandomText(5);
-        var key = Guid.NewGuid().ToString();
-
-        var entry = new CaptchaEntry
-        {
-            Value = text,
-            ExpiredAt = DateTime.UtcNow.AddMinutes(ExpireMinutes),
-            Attempts = 0
-        };
-
-        _cache.Set(key, entry, TimeSpan.FromMinutes(ExpireMinutes));
-
-        var imageBytes = GenerateImage(text);
+        var imageBytes = GenerateImage(text, req);
 
         return new ImageCaptchaResult
         {
@@ -133,18 +115,34 @@ public class CaptchaService : ICaptchaService
         return result == 0;
     }
 
-    private string GenerateRandomText(int length)
+    private string GenerateRandomText(CaptchaRequest req)
     {
-        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789*@#";
-        return new string(Enumerable.Range(0, length)
-            .Select(_ => chars[_rand.Next(chars.Length)])
-            .ToArray());
+        int length = Math.Min(req.Length, req.MaxLength);
+
+        const string normalChars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789";
+        const string specialChars = "@#$*&";
+
+        var result = new List<char>();
+
+        int specialCount = _rand.Next(1, Math.Min(req.MaxSpecialChars, length) + 1);
+
+        for (int i = 0; i < specialCount; i++)
+        {
+            result.Add(specialChars[_rand.Next(specialChars.Length)]);
+        }
+
+        for (int i = result.Count; i < length; i++)
+        {
+            result.Add(normalChars[_rand.Next(normalChars.Length)]);
+        }
+
+        return new string(result.OrderBy(_ => _rand.Next()).ToArray());
     }
 
-    private byte[] GenerateImage(string text)
+    private byte[] GenerateImage(string text, CaptchaRequest options)
     {
-        int width = 180;
-        int height = 60;
+        int width = options.WidthPerChar * text.Length;
+        int height = options.Height;
 
         using var image = new Image<Rgba32>(width, height);
 
@@ -160,29 +158,27 @@ public class CaptchaService : ICaptchaService
             {
                 float y = _rand.Next(5, 20);
 
-                // 🔥 warna random tiap huruf
-                var color = SixLabors.ImageSharp.Color.FromRgb(
+                var color = Color.FromRgb(
                     (byte)_rand.Next(50, 200),
                     (byte)_rand.Next(50, 200),
                     (byte)_rand.Next(50, 200));
 
-                // 🔥 rotate tiap huruf
                 float angle = _rand.Next(-30, 30);
 
-                var options = new DrawingOptions
+                var optionsDraw = new DrawingOptions
                 {
                     Transform = Matrix3x2.CreateRotation(
                         DegreesToRadians(angle),
                         new PointF(x, y))
                 };
 
-                ctx.DrawText(options, c.ToString(), font, color, new PointF(x, y));
+                ctx.DrawText(optionsDraw, c.ToString(), font, color, new PointF(x, y));
 
-                x += 30;
+                x += options.WidthPerChar;
             }
 
-            // 🔥 garis noise
-            for (int i = 0; i < 3; i++)
+            // noise lines
+            for (int i = 0; i < options.NoiseLines; i++)
             {
                 var p1 = new PointF(_rand.Next(width), _rand.Next(height));
                 var p2 = new PointF(_rand.Next(width), _rand.Next(height));
@@ -190,16 +186,20 @@ public class CaptchaService : ICaptchaService
                 ctx.DrawLine(Color.Gray, 1, p1, p2);
             }
 
-            // 🔥 titik noise
-            for (int i = 0; i < 100; i++)
+            // noise dots
+            for (int i = 0; i < options.NoiseDots; i++)
             {
                 ctx.Fill(Color.LightGray,
                     new EllipsePolygon(_rand.Next(width), _rand.Next(height), 1));
             }
+
+            if (options.BlurRadius > 0)
+            {
+                ctx.GaussianBlur(options.BlurRadius);
+            }
         });
 
-        // 🔥 WAVE DISTORTION
-        ApplyWaveDistortion(image);
+        ApplyWaveDistortion(image, options);
 
         using var ms = new MemoryStream();
         image.SaveAsPng(ms);
@@ -210,19 +210,16 @@ public class CaptchaService : ICaptchaService
     // ============================
     // 🔥 WAVE DISTORTION
     // ============================
-    private void ApplyWaveDistortion(Image<Rgba32> image)
+    private void ApplyWaveDistortion(Image<Rgba32> image, CaptchaRequest options)
     {
         int width = image.Width;
         int height = image.Height;
 
         using var clone = image.Clone();
 
-        float waveAmplitude = 5f;
-        float waveFrequency = 0.05f;
-
         for (int y = 0; y < height; y++)
         {
-            int offsetX = (int)(Math.Sin((y + _rand.Next(5)) * waveFrequency) * waveAmplitude);
+            int offsetX = (int)(Math.Sin((y + _rand.Next(5)) * options.WaveFrequency) * options.WaveAmplitude);
 
             for (int x = 0; x < width; x++)
             {
@@ -230,7 +227,7 @@ public class CaptchaService : ICaptchaService
 
                 if (srcX >= 0 && srcX < width)
                 {
-                    image[x, y] = clone[srcX, y]; // 🔥 ini kuncinya
+                    image[x, y] = clone[srcX, y];
                 }
             }
         }

@@ -9,7 +9,7 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        // Add services to the container.
+        // ✅ REGISTER SERVICES (HARUS SEBELUM BUILD)
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents()
             .AddCircuitOptions(options =>
@@ -17,24 +17,30 @@ public class Program
                 options.DetailedErrors = true;
             });
 
-        builder.Services.AddSandevBlazor();
+        builder.Services.AddSandevBlazor(options =>
+        {
+            options.PrimaryColor = "#6366f1";
+            options.DarkMode = false;
+        });
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // Middleware
         if (!app.Environment.IsDevelopment())
         {
             app.UseExceptionHandler("/Error");
-            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
 
-        app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+        app.UseStatusCodePagesWithReExecute("/not-found", null, true);
         app.UseHttpsRedirection();
-
         app.UseAntiforgery();
 
-        app.MapStaticAssets();
+        // ✅ STATIC FILES
+        app.UseStaticFiles(); // ✅ WAJIB
+        //app.MapStaticAssets();
+
+        // 🔥 INI YANG KAMU HAPUS TADI (WAJIB ADA)
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
 

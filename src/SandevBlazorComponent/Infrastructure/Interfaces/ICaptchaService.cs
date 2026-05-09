@@ -5,6 +5,6 @@ namespace SandevBlazorComponent.Infrastructure.Interfaces;
 public interface ICaptchaService
 {
     //(string key, string base64Image) GenerateCaptcha();
-    ImageCaptchaResult Generate();
+    ImageCaptchaResult Generate(CaptchaRequest options);
     bool ValidateCaptcha(string key, string input);
 }

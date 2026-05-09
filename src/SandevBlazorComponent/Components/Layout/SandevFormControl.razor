@@ -1,0 +1,27 @@
+﻿<div class="sandev-form-control">
+
+    @if (!string.IsNullOrEmpty(Label))
+    {
+        <label class="sandev-label">@Label</label>
+    }
+
+    @ChildContent
+
+    @if (!string.IsNullOrEmpty(Error))
+    {
+        <div class="sandev-error">@Error</div>
+    }
+    else if (!string.IsNullOrEmpty(Helper))
+    {
+        <div class="sandev-helper">@Helper</div>
+    }
+
+</div>
+
+@code {
+    [Parameter] public string? Label { get; set; }
+    [Parameter] public string? Error { get; set; }
+    [Parameter] public string? Helper { get; set; }
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

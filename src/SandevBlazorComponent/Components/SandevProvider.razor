@@ -1,0 +1,55 @@
+﻿@inject IJSRuntime JS
+@inject SandevOptions Options
+
+<CascadingValue Value="Options">
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private bool _loaded;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender || _loaded) return;
+
+        _loaded = true;
+
+        // 🔹 Load saved theme
+        var savedTheme = await JS.InvokeAsync<string>("sandevLoadTheme");
+
+        bool isDark;
+
+        if (!string.IsNullOrEmpty(savedTheme))
+        {
+            isDark = savedTheme == "dark";
+        }
+        else
+        {
+            // 🔹 fallback ke system
+            isDark = await JS.InvokeAsync<bool>("sandevGetSystemTheme");
+        }
+
+        Options.DarkMode = isDark;
+
+        // 🔹 Apply Theme
+        await JS.InvokeVoidAsync("sandevSetTheme", isDark);
+        await JS.InvokeVoidAsync("sandevSetPrimaryColor", Options.PrimaryColor);
+
+        // 🔹 Save (biar konsisten)
+        await JS.InvokeVoidAsync("sandevSaveTheme", isDark);
+    }
+
+    [JSInvokable]
+    public async Task OnSystemThemeChanged(bool isDark)
+    {
+        Options.DarkMode = isDark;
+
+        await JS.InvokeVoidAsync("sandevSetTheme", isDark);
+        await JS.InvokeVoidAsync("sandevSaveTheme", isDark);
+
+        StateHasChanged();
+    }
+}
+

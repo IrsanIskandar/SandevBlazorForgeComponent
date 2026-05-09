@@ -1,6 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 
+@using SandevBlazorComponent.Components.Layout
 @using SandevBlazorComponent.Components.ViewerAndEditor
 
 <PageTitle>Home</PageTitle>
@@ -20,7 +21,13 @@
 </InPlaceEditor>
 <br />
 <br />
-<CaptchaImage @ref="imageCaptcha" />
+<CaptchaImage Length="8"
+              MaxLength="10"
+              MaxSpecialChars="3"
+              BlurRadius="1.2f"
+              WaveAmplitude="2"
+              NoiseDots="120" 
+              WaveFrequency="0.5f" />
 
 <button @onclick="SubmitCaptchaImage">Submit</button>
 <br />
@@ -28,6 +35,52 @@
 <MathCaptcha @ref="mathCaptcha" />
 
 <button @onclick="SubmitMathCaptcha">Submit</button>
+<br />
+<br />
+<SandevTextbox Placeholder="Username" Icon="fa-solid fa-user" Color="ColorVariant.Orange" />
+
+<SandevTextbox Placeholder="Password" Icon="fa-solid fa-lock" Color="ColorVariant.Teal" Variant="InputVariant.Filled" />
+
+<SandevTextbox Placeholder="Email" Variant="InputVariant.Underline" Size="ItemSize.Lg" />
+
+<SandevTextbox Placeholder="Error state" IsError="true" />
+
+<SandevTextbox Placeholder="Success state" IsSuccess="true" />
+
+<SandevTextbox Label="Email"
+               Type="InputType.Email"
+               PrefixIcon="fa-solid fa-envelope"
+               Color="ColorVariant.Sky"
+               Clearable="true" />
+
+<SandevTextbox Label="Password"
+               Type="InputType.Password"
+               PrefixIcon="fa-solid fa-lock"
+               EnablePasswordToggle="true"
+               Color="ColorVariant.Violet" />
+
+<SandevTextbox Label="Username"
+               PrefixIcon="fa-solid fa-user"
+               Color="ColorVariant.Emerald" />
+
+<SandevTextbox Label="Soft Pink" Color="ColorVariant.Rose" />
+
+<br />
+<br />
+<SandevFormControl Label="Username" Helper="Masukkan username anda">
+    <SandevTextbox Icon="fa-solid fa-user" />
+</SandevFormControl>
+
+<SandevFormControl Label="Email" Error="Email tidak valid">
+    <SandevTextbox Icon="fa-solid fa-envelope" IsError="true" />
+</SandevFormControl>
+
+<button @onclick="SubmitMathCaptcha">Submit</button>
+<br />
+<br />
+<SandevThemeToggle />
+
+
 
 @code {
     private string defaultValue = "";

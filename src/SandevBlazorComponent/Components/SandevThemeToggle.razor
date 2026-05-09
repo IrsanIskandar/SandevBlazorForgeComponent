@@ -1,0 +1,23 @@
+﻿@inject IJSRuntime JS
+@inject SandevOptions Options
+
+<button class="sandev-theme-toggle" @onclick="ToggleTheme">
+    @if (Options.DarkMode)
+    {
+        <i class="fa-solid fa-moon"></i>
+    }
+    else
+    {
+        <i class="fa-solid fa-sun"></i>
+    }
+</button>
+
+@code {
+    private async Task ToggleTheme()
+    {
+        Options.DarkMode = !Options.DarkMode;
+
+        await JS.InvokeVoidAsync("sandevSetTheme", Options.DarkMode);
+        await JS.InvokeVoidAsync("sandevSaveTheme", Options.DarkMode);
+    }
+}

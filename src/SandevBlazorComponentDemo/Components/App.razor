@@ -6,23 +6,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <ResourcePreloader />
-    <link rel="stylesheet" href="@Assets["lib/bootstrap/dist/css/bootstrap.min.css"]" />
-    <link rel="stylesheet" href="@Assets["app.css"]" />
-    <link rel="stylesheet" href="@Assets["SandevBlazorComponentDemo.styles.css"]" />
+    <link href="./lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="./app.css" rel="stylesheet" />
 
-    <link href="_content/SandevBlazorComponent/css/sandev-blazor.css" rel="stylesheet" />
+    <!-- Sandev CSS -->
+    <link rel="stylesheet" href="_content/SandevBlazorComponent/css/sandev-blazor.css" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="_content/SandevBlazorComponent/font-awesome/css/all.min.css" />
+
     <ImportMap />
     <link rel="icon" type="image/png" href="favicon.png" />
     <HeadOutlet />
 </head>
 
 <body>
-    <Routes />
-    <ReconnectModal />
-    <script src="@Assets["_framework/blazor.web.js"]"></script>
+    <!-- 🔥 Provider sebagai root -->
+    <SandevProvider>
+        <Routes @rendermode="InteractiveServer" />
+    </SandevProvider>
 
-    
+    <ReconnectModal />
+
+    <!-- WAJIB -->
+    <script src="_content/SandevBlazorComponent/js/sandev-loader.js"></script>
     <script src="_content/SandevBlazorComponent/js/sandev-blazor.js"></script>
+    
+    <script src="@Assets["_framework/blazor.web.js"]"></script>
 </body>
 
 </html>

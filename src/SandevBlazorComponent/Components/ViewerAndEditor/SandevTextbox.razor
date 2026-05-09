@@ -1,0 +1,164 @@
+﻿<div class="sandev-field @StateClass @GetColorClass()">
+
+    <div class="sandev-input-container">
+
+        @if (!string.IsNullOrEmpty(PrefixIcon))
+        {
+            <i class="@PrefixIcon sandev-prefix"></i>
+        }
+
+        <input id="@_id"
+               name="@(!string.IsNullOrWhiteSpace(Name) ? Name : _id)"
+               type="@GetInputType()"
+               class="sandev-input @InputClass @PaddingClass"
+               value="@Value"
+               placeholder="@Placeholder"
+               aria-invalid="@(IsError ? "true" : "false")"
+               aria-describedby="@(_id + "-error")"
+               @oninput="HandleInput" />
+
+        @if (!string.IsNullOrEmpty(Label))
+        {
+            <label for="@_id" class="sandev-label">@Label</label>
+        }
+
+        @if (Clearable && !string.IsNullOrEmpty(Value))
+        {
+            <button type="button" class="sandev-clear" @onclick="Clear">
+                ✕
+            </button>
+        }
+
+        @if (Type == InputType.Password && EnablePasswordToggle)
+        {
+            <button type="button" class="sandev-suffix" @onclick="TogglePassword">
+                <i class="@(_showPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye")"></i>
+            </button>
+        }
+        else if (!string.IsNullOrEmpty(SuffixIcon))
+        {
+            <i class="@SuffixIcon sandev-suffix"></i>
+        }
+
+    </div>
+
+    @if (IsError && !string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div id="@(_id + "-error")" class="sandev-error">
+            @ErrorMessage
+        </div>
+    }
+
+</div>
+
+@code {
+    [Parameter] public string Label { get; set; } = "";
+    [Parameter] public string? Id { get; set; }
+    [Parameter] public string? Name { get; set; }
+
+    [Parameter] public string? Value { get; set; }
+    [Parameter] public EventCallback<string?> ValueChanged { get; set; }
+
+    [Parameter] public string? Placeholder { get; set; }
+    [Parameter] public string? Icon { get; set; }
+
+    [Parameter] public string? PrefixIcon { get; set; }
+    [Parameter] public string? SuffixIcon { get; set; }
+
+    [Parameter] public bool EnablePasswordToggle { get; set; }
+
+    [Parameter] public InputType Type { get; set; } = InputType.Text;
+    [Parameter] public InputVariant Variant { get; set; } = InputVariant.Outline;
+    [Parameter] public ItemSize Size { get; set; } = ItemSize.Md;
+    [Parameter] public ColorVariant Color { get; set; } = ColorVariant.Primary;
+
+    [Parameter] public bool Clearable { get; set; }
+
+    [Parameter] public bool IsSuccess { get; set; }
+
+    [Parameter] public bool IsError { get; set; }
+    [Parameter] public string? ErrorMessage { get; set; }
+    [Parameter] public int Debounce { get; set; } = 0;
+
+    private string WrapperClass => $"{SizeClass}";
+    private string InputClass => $"{VariantClass} {StateClass}";
+    private string _id = $"sandev-input-{Guid.NewGuid().ToString("N")[..8]}";
+
+    private bool _showPassword = false;
+
+    private CancellationTokenSource? _cts;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+
+        if (!string.IsNullOrWhiteSpace(Id))
+            _id = Id!;
+    }
+
+    private string GetColorClass() => $"sandev-{Color.ToString().ToLower()}";
+
+    private string PaddingClass => (!string.IsNullOrEmpty(PrefixIcon) ? "has-prefix" : "") + ((Clearable || !string.IsNullOrEmpty(SuffixIcon) || EnablePasswordToggle) ? " has-suffix" : "");
+
+    private async Task HandleInput(ChangeEventArgs e)
+    {
+        var val = e.Value?.ToString();
+
+        Value = val; // 🔥 WAJIB
+
+        if (Debounce > 0)
+        {
+            _cts?.Cancel();
+            _cts = new CancellationTokenSource();
+
+            try
+            {
+                await Task.Delay(Debounce, _cts.Token);
+                await ValueChanged.InvokeAsync(val);
+            }
+            catch (TaskCanceledException) { }
+        }
+        else
+        {
+            await ValueChanged.InvokeAsync(val);
+        }
+    }
+
+    private string VariantClass => Variant switch
+    {
+        InputVariant.Filled => "input-filled",
+        InputVariant.Underline => "input-underline",
+        _ => ""
+    };
+
+    private string SizeClass => Size switch
+    {
+        ItemSize.Sm => "input-sm",
+        ItemSize.Lg => "input-lg",
+        _ => ""
+    };
+
+    private string StateClass =>
+        IsError ? "error" :
+        IsSuccess ? "success" :
+        "";
+
+    private void Clear()
+    {
+        Value = string.Empty;
+        ValueChanged.InvokeAsync(Value);
+    }
+
+    private InputType GetInputType()
+    {
+        if (Type == InputType.Password && EnablePasswordToggle)
+            return _showPassword ? InputType.Text : InputType.Password;
+
+        return Type;
+    }
+
+    private void TogglePassword()
+    {
+        _showPassword = !_showPassword;
+    }
+}
